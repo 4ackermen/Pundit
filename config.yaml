@@ -1,3 +1,6 @@
 pundit:
 storage:
     master: master
+    database: pundit
+    db_user: punditadmin
+    db_pass: test

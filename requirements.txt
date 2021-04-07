@@ -1,1 +1,2 @@
 PyYAML==5.4.1
+mysql-connector-python==8.0.23
