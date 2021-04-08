@@ -48,3 +48,21 @@ class Pundit:
                 cnx.commit()
                 cnx.close()
                 return "Successfully Registered!!"
+
+        def getName(self, id_=''):
+            cnx = mysql.connector.connect(
+                host="localhost",
+                user=STORAGE['db_user'],
+                password=STORAGE['db_pass'],
+                database=STORAGE['database'],
+                auth_plugin='mysql_native_password'
+            )
+            cursor = cnx.cursor()
+            cursor.execute(
+                "SELECT name from users where userid={}".format(id_[0]))
+            try:
+                name = cursor.fetchone()[0].split('#')[0]
+            except:
+                return None
+            cnx.close()
+            return name
