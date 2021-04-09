@@ -1,10 +1,20 @@
 import mysql.connector
+from shutil import copy
+from core.pundit.helpers import (
+    unzip
+)
 from os import (
     mkdir,
-    path
+    listdir,
+    path,
+    rename
 )
 from yaml import (
     safe_load
+)
+from urllib.request import (
+    urlretrieve,
+    URLError
 )
 
 with open("config.yaml", 'r') as file:
@@ -49,20 +59,85 @@ class Pundit:
                 cnx.close()
                 return "Successfully Registered!!"
 
-        def getName(self, id_=''):
-            cnx = mysql.connector.connect(
-                host="localhost",
-                user=STORAGE['db_user'],
-                password=STORAGE['db_pass'],
-                database=STORAGE['database'],
-                auth_plugin='mysql_native_password'
+    def getName(self, id_=''):
+        cnx = mysql.connector.connect(
+            host="localhost",
+            user=STORAGE['db_user'],
+            password=STORAGE['db_pass'],
+            database=STORAGE['database'],
+            auth_plugin='mysql_native_password'
+        )
+        cursor = cnx.cursor()
+        cursor.execute(
+            "SELECT name from users where userid={}".format(id_[0]))
+        try:
+            name = cursor.fetchone()[0].split('#')[0]
+        except:
+            return None
+        cnx.close()
+        return name
+
+    def evaluate(self, user, link, ticket):
+        tmp = mktemp()
+        cnx = mysql.connector.connect(
+            host="localhost",
+            user=STORAGE['db_user'],
+            password=STORAGE['db_pass'],
+            database=STORAGE['database'],
+            auth_plugin='mysql_native_password'
+        )
+        cursor = cnx.cursor()
+        cursor.execute(
+            "SELECT userpath from users where userid={}".format(str(user.id)))
+        userpath = cursor.fetchone()[0]
+        "" if path.exists(path.join(self.master, 'byusers', userpath)) else mkdir(
+            path.join(self.master, 'byusers', userpath))
+        usersubs = len(listdir(path.join(self.master, 'byusers', userpath)))
+        try:
+            urlretrieve(
+                link,
+                path.join(tmp.name, "tasks.zip")
             )
-            cursor = cnx.cursor()
-            cursor.execute(
-                "SELECT name from users where userid={}".format(id_[0]))
-            try:
-                name = cursor.fetchone()[0].split('#')[0]
-            except:
-                return None
-            cnx.close()
-            return name
+            unzip(
+                path.join(tmp.name, "tasks.zip"),
+                tmp.name,
+            )
+
+            if(len(listdir(tmp.name)) > 0):
+                mkdir(path.join(self.master, 'byusers', userpath, "{}_{}"
+                                .format(
+                                    str(usersubs+1).zfill(3),
+                                    ticket
+                                )))
+                mkdir(path.join(tmp.name, "templates"))
+                copy(
+                    path.join(tmp.name, "tasks.zip"),
+                    path.join(tmp.name, "templates", "tasks.zip")
+                )
+                rename(
+                    path.join(tmp.name, "tasks.zip"),
+                    path.join(self.master, 'byusers', userpath, "{}_{}/tasks.zip"
+                                  .format(
+                                      str(usersubs+1).zfill(3),
+                                      ticket
+                                  )))
+                unzip(
+                    path.join(self.master, 'byusers', userpath, "{}_{}/tasks.zip"
+                                  .format(
+                                      str(usersubs+1).zfill(3),
+                                      str(ticket)
+                                  )),
+                    path.join(self.master, 'byusers', userpath, "{}_{}/"
+                                  .format(
+                                      str(usersubs+1).zfill(3),
+                                      str(ticket)
+                                  ))
+                )
+            else:
+                return(
+                    False,
+                    "Please submit one or more solution!!"
+                )
+
+        except Exception as e:
+            print(e)
