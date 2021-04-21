@@ -7,6 +7,14 @@ from os import (
     mkdir,
     path,
 )
+from random import randrange
+from shutil import copy
+from subprocess import call as exe
+from threading import (
+    Thread,
+    Timer,
+)
+from time import sleep
 
 
 class Validator:
@@ -41,3 +49,65 @@ class Validator:
         self.conn, _ = sock.accept()
         status = self.recv().decode()
         return status
+
+    def container(self):
+        copy(
+            "tasks.yaml",
+            path.join(self.tmp.name, "templates", "tasks.yaml")
+        )
+        copy(
+            path.join("models", "templates", "Dockerfile"),
+            path.join(self.tmp.name, path.join("templates", "Dockerfile"))
+        )
+        copy(
+            path.join("models", "templates", "runner.py"),
+            path.join(self.tmp.name, "templates", "runner.py")
+        )
+        copy(
+            path.join("models", "templates", "requirements.txt"),
+            path.join(self.tmp.name, "templates", "requirements.txt")
+        )
+        self.replace(
+            "SEDMYZIP",
+            path.join(getcwd(), self.filename),
+            path.join(self.tmp.name, "templates", "Dockerfile")
+        )
+        self.replace(
+            "SEDMYSUBMISSION",
+            repr(self.submission),
+            path.join(self.tmp.name, "templates", "Dockerfile")
+        )
+        try:
+            self.replace(
+                "SEDMYPORT",
+                str(self.vport),
+                path.join(self.tmp.name, "templates", "Dockerfile")
+            )
+        except AttributeError:
+            sleep(0.5)
+            self.replace(
+                "SEDMYPORT",
+                str(self.vport),
+                path.join(self.tmp.name, "templates", "Dockerfile")
+            )
+        exe(["docker", "build", "--tag", "{}.{}"
+             .format(
+                 re.sub(r'[^0-9a-zA-Z]+', '', self.user).lower(),
+                 self.tag
+             ), path.join(self.tmp.name, "templates")])
+        exe(["docker", "run", "-t", "-i", "--rm", "{}.{}"
+             .format(
+                 re.sub(r'[^0-9a-zA-Z]+', '', self.user).lower(),
+                 self.tag,
+             )])
+
+    def validate(self):
+        cnt = Thread(target=self.container)
+        cnt.start()
+        report = self.check()
+        exe(["docker", "image", "rm", "-f", "{}.{}"
+             .format(
+                 re.sub(r'[^0-9a-zA-Z]+', '', self.user).lower(),
+                 self.tag
+             )])
+        return report
