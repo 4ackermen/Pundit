@@ -142,3 +142,82 @@ class Pundit:
 
         except Exception as e:
             print(e)
+
+    def solvedbyuser(self, param):
+        cnx = mysql.connector.connect(
+            host="localhost",
+            user=STORAGE['db_user'],
+            password=STORAGE['db_pass'],
+            database=STORAGE['database'],
+            auth_plugin='mysql_native_password'
+        )
+        if(type(param) == int):
+            execute = "SELECT tasks from users where userid={}".format(param)
+        else:
+            execute = "SELECT tasks from users where name={}".format(
+                repr(param))
+        cursor = cnx.cursor()
+        cursor.execute(execute)
+        try:
+            solved = list(map(lambda x: x[0], eval(cursor.fetchone()[0])))
+        except:
+            solved = None
+        cnx.close()
+        return solved
+
+    def leaderboard(self, count=3, all=False):
+        cnx = mysql.connector.connect(
+            host="localhost",
+            user=STORAGE['db_user'],
+            password=STORAGE['db_pass'],
+            database=STORAGE['database'],
+            auth_plugin='mysql_native_password'
+        )
+        cursor = cnx.cursor()
+        cursor.execute(
+            "SELECT userid, score from users ORDER BY score DESC, entropy")
+        board = cursor.fetchall()
+        cnx.close()
+        return board if all else board[:count]
+
+    def firstbloods(self):
+        cnx = mysql.connector.connect(
+            host="localhost",
+            user=STORAGE['db_user'],
+            password=STORAGE['db_pass'],
+            database=STORAGE['database'],
+            auth_plugin='mysql_native_password'
+        )
+        cursor = cnx.cursor()
+        cursor.execute(
+            "SELECT name, tasks from users ORDER BY score DESC, entropy")
+        data = cursor.fetchall()
+        data = list(map(lambda data: (data[0], eval(data[1])), data))
+        """
+        data = [('userid', [('task1', 'timestamp'), ('task2', 'timestamp2')]), ('userid2', [('task1', 'timestamp'), ('task2', 'timestamp2')])...]
+        """
+        bloods = {}
+        for task in TASKS:
+            solved = []
+            for entry in data:
+                """
+                data = [('userid', [('task1', 'timestamp'), ('task2', 'timestamp2')]), ('userid2', [('task1', 'timestamp'), ('task2', 'timestamp2')])...]
+                """
+                if(any(t[0] == task for t in entry[1])):
+                    solved.append((
+                        entry[0],
+                        int(list(filter(None,
+                                        list(map(
+                                            lambda submission, task: submission[1] if submission[0] == task else None,
+                                            entry[1],
+                                            [task for _ in range(
+                                                len(entry[1]))]
+                                        ))))[0]
+                            )
+                    ))
+            if(solved):
+                bloods[task] = sorted(
+                    solved, key=lambda x: x[1])[0]
+            else:
+                bloods[task] = None
+        return bloods
