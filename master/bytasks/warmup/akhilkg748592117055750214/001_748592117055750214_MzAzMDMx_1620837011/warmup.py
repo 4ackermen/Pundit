@@ -1,1 +1,0 @@
-pundit{this_is_a_warm_up_challenge}
