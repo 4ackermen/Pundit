@@ -1,3 +1,4 @@
+python-dotenv
 PyYAML==5.4.1
 mysql-connector-python==8.0.23
 pwntools==4.4.0
