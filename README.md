@@ -1,4 +1,43 @@
+
+![Logo](https://user-images.githubusercontent.com/32199592/118006127-a0c27000-b368-11eb-8864-20a3a233c9c2.png)
+
+    
 # Pundit
+
+A Discord Bot for recruiting teams
+
+
+
+[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
+
+[![Support Server](https://img.shields.io/discord/591914197219016707.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/gFgsKNq3)
+## Features
+
+**Task Submission**
+- Handles submission from users
+- Set submission templates
+- Support for multiple languages
+
+**Task Verification**
+- Handles plagiarism using MOSS
+- Flag checker
+- Allows to run test cases
+
+**Leaderboard**
+- Manages public leaderboard 
+
+**Statistics**
+- Track a user's progress
+## Tech Stack
+
+Python, Docker, and the Discord API
+
+  
+## Demo
+
+Add Pundit to your Discord server by clicking [here]()
 
 ## Installation
 
@@ -11,41 +50,22 @@ cd pundit
 python3 start.py
 ```
 
-## Pundit
 
 Update the discord bot's token in `config.yaml`
 Note: Written for discord.py==1.4.1
 
-### Usage
+## Usage
 
+```
 - !help
-
-### config.yaml
-
-```yaml
-pundit:
-  server: <server-guild-id>
-  adminroles:
-    - admin
-    - mod
-  admincategories:
-    - admins
-  mossid: <moss-api-key>
-  prefix: !!str "!"
-  token: <discord-bot-token>
-
-storage:
-  master: /path/to/master/submissions/folder
-  repo: github.com/4ackermen/Pundit.git
-  token: <git-token>
-  database: <database-name>
-  db_user: <db-user>
-  db_pass: <db-user-password>
 ```
 
-## Task Validator
+  
+## Documentation
 
-### For Challenge Authors
+### Task Validator
+
+#### For Challenge Authors
 
 Supported Challenge Types
 
@@ -58,7 +78,7 @@ TODO
 
 - restrict a few systemcalls for c and asm tasks
 
-### tasks.yaml
+#### tasks.yaml
 
 ```yaml
 sanity:
@@ -119,7 +139,7 @@ swapper:
 
 **Refer [tasks.yaml](./tasks.yaml) for more accurate instructions**
 
-### For Players
+#### For Players
 
 All the tasks must be zipped in the following structure
 
@@ -143,3 +163,17 @@ Ex.
 All the python files must take the testcase input from stdin and print the respective output to stdout.
 
 The flag evaluated solutions should be named `task.flag` with the contents `flag{.*}` i.e, the respective flag.
+
+
+
+## Authors
+
+- Bommidi Jaswanth
+- Suraj K Suresh
+- Keshav Varma
+- Akhil K G
+
+  
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
