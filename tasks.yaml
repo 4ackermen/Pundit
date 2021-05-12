@@ -97,3 +97,39 @@ multiply:
             - ['6574367365573896']
             - ['36619120054407228460']
             - ['97658425666080']
+
+
+togetten:
+    name: Toget10
+    desc: None
+    tags:
+        - programming
+    value: 150
+    flageval: no
+    language: c
+    flags:
+        - -v
+    maxlines: 0
+    allowed: None
+    delimiter: !!str "\n"
+    testcases:
+        sample:
+           "": ""
+        input:
+            - ['2', '8 9']
+            - ['2', '10 10']
+            - ['4', '5 6 7 8']
+        output:
+            - ['4']
+            - ['0']
+            - ['24']
+
+
+warmup:
+   name: warmup
+   desc: None
+   tags:
+      - web
+   value: 150
+   flageval: yes
+   flag: "pundit{this_is_a_warm_up_challenge}"

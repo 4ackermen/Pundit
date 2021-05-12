@@ -1,7 +1,6 @@
 import re
 import shlex
 import socket
-
 from os import (
     getcwd,
     mkdir,
@@ -15,6 +14,8 @@ from threading import (
     Timer,
 )
 from time import sleep
+
+from pwn import process
 
 
 class Validator:
@@ -95,7 +96,7 @@ class Validator:
                  re.sub(r'[^0-9a-zA-Z]+', '', self.user).lower(),
                  self.tag
              ), path.join(self.tmp.name, "templates")])
-        exe(["docker", "run", "-t", "-i", "--rm", "{}.{}"
+        exe(["docker", "run", "-t", "-i", "--rm", "--net=host","{}.{}"
              .format(
                  re.sub(r'[^0-9a-zA-Z]+', '', self.user).lower(),
                  self.tag,
